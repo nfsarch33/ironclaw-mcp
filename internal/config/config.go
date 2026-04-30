@@ -48,27 +48,6 @@ type Config struct {
 	PrometheusMetricsPort string
 }
 
-// MCCLIPath returns the path to the optional Mission-Control / ops CLI binary
-// used by the legacy mc-cli tool surface (Mission Control orchestration,
-// fleet ops, governance/timeline/llm-route, persona spawn, and similar).
-// These tools are NOT generic IronClaw HTTP-bridge tools; they ship behind
-// IRONCLAW_MCP_LEGACY_TOOLS=1 and are slated for extraction into a dedicated
-// ironclaw-mc-cli-mcp repo (see CHANGELOG v0.5.0). Default "mc-cli" (from PATH);
-// set MCCLI_PATH to empty to force-disable even when legacy tools are on.
-func MCCLIPath() string {
-	return envOrDefault("MCCLI_PATH", "mc-cli")
-}
-
-// LegacyMCCLIToolsEnabled reports whether the optional, opinionated mc-cli /
-// gws tool surface should be registered. Defaults to false so a fresh install
-// of ironclaw-mcp serves only the generic IronClaw HTTP gateway tools. Set
-// IRONCLAW_MCP_LEGACY_TOOLS=1 (or "true") to opt in until the planned
-// extraction to ironclaw-mc-cli-mcp lands.
-func LegacyMCCLIToolsEnabled() bool {
-	v := strings.ToLower(strings.TrimSpace(os.Getenv("IRONCLAW_MCP_LEGACY_TOOLS")))
-	return v == "1" || v == "true" || v == "yes" || v == "on"
-}
-
 // Load reads configuration from environment variables with sensible defaults.
 func Load() (*Config, error) {
 	cfg := &Config{
