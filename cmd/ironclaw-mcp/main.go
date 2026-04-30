@@ -18,7 +18,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
-const version = "0.1.0"
+const version = "0.5.0"
 
 func main() {
 	if err := run(); err != nil {
@@ -50,12 +50,27 @@ func run() error {
 		logger.Info("prometheus enabled", "url", cfg.PrometheusURL)
 	}
 
-	var cli tools.CLIRunner
-	if bin := config.MCCLIPath(); bin != "" {
-		cli = tools.NewExecCLIRunner(bin)
+	// Generic-by-default: only wire the opinionated mc-cli / gws tool surface
+	// when the operator opts in via IRONCLAW_MCP_LEGACY_TOOLS=1. Out of the box
+	// ironclaw-mcp exposes only the generic IronClaw HTTP gateway tools.
+	var (
+		cli tools.CLIRunner
+		gws tools.CLIRunner
+	)
+	if config.LegacyMCCLIToolsEnabled() {
+		if bin := config.MCCLIPath(); bin != "" {
+			cli = tools.NewExecCLIRunner(bin)
+		}
+		gws = tools.NewExecCLIRunner("gws")
+		logger.Info("legacy mc-cli tool surface enabled",
+			"mc_cli_path", config.MCCLIPath(),
+			"note", "extraction to ironclaw-mc-cli-mcp planned for v0.6.x",
+		)
+	} else {
+		logger.Info("legacy mc-cli tool surface disabled (default)",
+			"hint", "set IRONCLAW_MCP_LEGACY_TOOLS=1 to opt in",
+		)
 	}
-
-	gws := tools.NewExecCLIRunner("gws")
 
 	srv := server.New(client, prom, cli, gws, logger, version)
 

@@ -5,9 +5,25 @@
 
 A production-ready **MCP (Model Context Protocol) server** written in Go that bridges [IronClaw](https://github.com/nearai/ironclaw) with any MCP-compatible AI coding assistant — Cursor, Claude Code, VS Code Copilot, and more.
 
-> **v1.0 cleanup (April 2026)**: Removed all `ironclaw_research_*`, `ironclaw_ui_*`, and `ironclaw_evolver_*` tools that wrapped the external `research-agent` CLI. `ironclaw-mcp` is now a focused IronClaw HTTP-bridge with optional CLI-driven dual-ops surfaces. Scraper, browser-automation, and evolver workflows have been moved out-of-tree (see `agentic-ai-research` for replacement tooling). The pre-cleanup snapshots are archived under `~/Code/global-kb/session-handoffs/evidence/v257-w2-d0-ironclaw-mcp-cleanup/before/`.
+> **v0.5.0 generic-by-default (April 2026)**: `ironclaw-mcp` now ships only the
+> generic IronClaw HTTP-gateway tool surface out of the box. The previously
+> auto-loaded mc-cli / Mission-Control / fleet ops / persona / Google Workspace
+> tools are now opt-in via `IRONCLAW_MCP_LEGACY_TOOLS=1`, and are slated for
+> extraction into a dedicated sibling repo (`ironclaw-mc-cli-mcp`) in the next
+> release. See `CHANGELOG.md`.
+>
+> **v0.4.0 scraper cleanup (April 2026)**: Removed all `ironclaw_research_*`,
+> `ironclaw_ui_*`, and `ironclaw_evolver_*` tools that wrapped the external
+> `research-agent` CLI. Scraper, browser-automation, and evolver workflows
+> have been moved out-of-tree (see `agentic-ai-research` for replacement
+> tooling). Pre-cleanup snapshots are archived under
+> `~/Code/global-kb/session-handoffs/evidence/v257-w2-d0-ironclaw-mcp-cleanup/before/`.
 
-## Tools Exposed
+## Default Tool Surface (generic IronClaw HTTP-bridge, 14 tools)
+
+These tools are always registered when the IronClaw gateway is reachable;
+they speak only the documented IronClaw HTTP API and ship no
+deployment-specific assumptions.
 
 | Tool | Description |
 |---|---|
@@ -22,10 +38,21 @@ A production-ready **MCP (Model Context Protocol) server** written in Go that br
 | `ironclaw_list_tools` | List all tools registered in IronClaw extensions |
 | `ironclaw_stack_status` | Combined health of LLM router nodes, GPU availability, and gateway |
 | `ironclaw_spawn_agent` | Spawn a new agent job with model and tier selection |
-| `ironclaw_send_task` | Send a strategic task for background execution |
+| `ironclaw_send_task` | Enqueue a background task/message via the IronClaw gateway |
 | `ironclaw_agent_status` | Agent thread states, active/total job counts, last heartbeat |
-| `ironclaw_get_metrics` | Query Prometheus for agent metrics (requires `PROMETHEUS_URL`) |
-| `ironclaw_reviewed_push` | Run Gemini diff review, then push only when no must-fix issues remain |
+| `ironclaw_reviewed_push` | Run Gemini diff review, then push only when no must-fix issues remain (independent of the IronClaw gateway; consider extracting in a future release) |
+
+### Optional adjuncts
+
+| Env var / flag | Tool(s) added | Notes |
+|---|---|---|
+| `PROMETHEUS_URL=...` | `ironclaw_get_metrics` | Adjunct Prometheus query bridge; +1 tool |
+| `IRONCLAW_MCP_LEGACY_TOOLS=1` | mc-cli ops/persona/fleet/governance + Google Workspace | +39 tools; planned for extraction to `ironclaw-mc-cli-mcp` |
+
+The legacy surface is **opt-in only** so a fresh deployment of `ironclaw-mcp`
+exposes a clean, deployment-agnostic IronClaw bridge. Operators who relied on
+the previous behaviour should set `IRONCLAW_MCP_LEGACY_TOOLS=1` until they
+migrate to the dedicated `ironclaw-mc-cli-mcp` MCP server (planned v0.6.x).
 
 ## Quick Start
 

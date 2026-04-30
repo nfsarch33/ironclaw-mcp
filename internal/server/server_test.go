@@ -85,28 +85,34 @@ func (m *mockCLI) Run(ctx context.Context, args ...string) (string, error) {
 func TestNew_RegistersBaseTools(t *testing.T) {
 	srv := New(new(mockClient), nil, nil, nil, discardLogger(), "0.1.0")
 	count := srv.RegisteredToolCount()
-	// v1.0 baseline (post research/uiauto/evolver removal): 14 core IronClaw HTTP-bridge tools.
+	// Generic IronClaw HTTP-bridge baseline (default-on, no opt-ins).
 	assert.Equal(t, 14, count)
 }
 
 func TestNew_WithPrometheus_RegistersMetricsTool(t *testing.T) {
 	srv := New(new(mockClient), new(mockProm), nil, nil, discardLogger(), "0.1.0")
 	count := srv.RegisteredToolCount()
-	// 14 base + get_metrics = 15
+	// Generic baseline + ironclaw_get_metrics when PROMETHEUS_URL is configured.
 	assert.Equal(t, 15, count)
 }
 
-func TestNew_WithCLI_RegistersCEOTools(t *testing.T) {
+// TestNew_WithLegacyCLI_RegistersOpsTools verifies that opting in to the
+// legacy mc-cli surface (IRONCLAW_MCP_LEGACY_TOOLS=1 in main.go) registers
+// the full Mission-Control / fleet / ops tool set. Those tools are slated
+// for extraction into a dedicated ironclaw-mc-cli-mcp repo (see CHANGELOG
+// v0.5.0). Total = 14 generic + 6 persona/CEO + 9 dual-ops + 22 ops/extended.
+func TestNew_WithLegacyCLI_RegistersOpsTools(t *testing.T) {
 	srv := New(new(mockClient), nil, &mockCLI{}, nil, discardLogger(), "0.1.0")
 	count := srv.RegisteredToolCount()
-	// 14 base + 6 CEO + 9 Sprint-65 dual-ops + 11 Sprint-68 ops + 11 Sprint-69 extended = 51
 	assert.Equal(t, 51, count)
 }
 
+// TestNew_WithAll_RegistersAllTools covers the maximal surface:
+// generic baseline + Prometheus adjunct + legacy CLI ops + GWS bridge.
+// = 14 generic + 1 prom + 6 persona/CEO + 1 gws + 9 dual-ops + 22 ops/extended.
 func TestNew_WithAll_RegistersAllTools(t *testing.T) {
 	srv := New(new(mockClient), new(mockProm), &mockCLI{}, &mockCLI{}, discardLogger(), "0.1.0")
 	count := srv.RegisteredToolCount()
-	// 14 base + get_metrics + 6 CEO + 1 GWS + 9 dual-ops + 22 ops/extended = 53
 	assert.Equal(t, 53, count)
 }
 

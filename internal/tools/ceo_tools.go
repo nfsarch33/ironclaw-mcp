@@ -31,10 +31,14 @@ func NewCRMBriefHandler(cli CLIRunner) *CRMBriefHandler {
 }
 
 // Tool returns the ironclaw_crm_brief tool definition.
+//
+// NOTE: This tool is part of the legacy mc-cli surface and is slated for
+// extraction to a dedicated ironclaw-mc-cli-mcp repo (see CHANGELOG v0.5.0).
+// It is only registered when IRONCLAW_MCP_LEGACY_TOOLS=1 is set.
 func (h *CRMBriefHandler) Tool() mcp.Tool {
 	return mcp.NewTool(
 		"ironclaw_crm_brief",
-		mcp.WithDescription("Generate a meeting prep brief for a contact (Executive Hathaway). Calls mc-cli crm prep-meeting."),
+		mcp.WithDescription("Generate a CRM meeting prep brief for a contact via the configured mc-cli binary. Wraps `mc-cli crm prep-meeting`."),
 		mcp.WithString("contact_id", mcp.Required(), mcp.Description("Contact ID (e.g. from crm list)")),
 		mcp.WithString("objective", mcp.Description("Optional meeting objective")),
 	)
@@ -71,10 +75,13 @@ func NewMorningBriefHandler(cli CLIRunner) *MorningBriefHandler {
 }
 
 // Tool returns the ironclaw_morning_brief tool definition.
+//
+// NOTE: Legacy mc-cli surface (gated behind IRONCLAW_MCP_LEGACY_TOOLS=1).
+// Slated for extraction to ironclaw-mc-cli-mcp.
 func (h *MorningBriefHandler) Tool() mcp.Tool {
 	return mcp.NewTool(
 		"ironclaw_morning_brief",
-		mcp.WithDescription("Generate the Morning COO brief (optionally with live GitHub/HN/repo data). Calls mc-cli brief generate [--live]."),
+		mcp.WithDescription("Generate a daily operational brief from configured live feeds (GitHub/HN/repo diffs) via mc-cli. Wraps `mc-cli brief generate [--live]`."),
 		mcp.WithString("date", mcp.Description("Date YYYY-MM-DD (default: today)")),
 		mcp.WithString("live", mcp.Description("Set to true to include live feeds (GitHub, HN, repo diffs)")),
 	)
@@ -99,7 +106,7 @@ func (h *MorningBriefHandler) Handle(ctx context.Context, req mcp.CallToolReques
 	return mcp.NewToolResultText(out), nil
 }
 
-// NightAuditHandler triggers the Night Auditor routine.
+// NightAuditHandler triggers the configured nightly audit pipeline via mc-cli.
 type NightAuditHandler struct {
 	cli CLIRunner
 }
@@ -110,12 +117,15 @@ func NewNightAuditHandler(cli CLIRunner) *NightAuditHandler {
 }
 
 // Tool returns the ironclaw_run_night_audit tool definition.
+//
+// NOTE: Legacy mc-cli surface (gated behind IRONCLAW_MCP_LEGACY_TOOLS=1).
+// Slated for extraction to ironclaw-mc-cli-mcp.
 func (h *NightAuditHandler) Tool() mcp.Tool {
 	return mcp.NewTool(
 		"ironclaw_run_night_audit",
-		mcp.WithDescription("Run the Night Auditor pipeline (tests, infra check, report). Calls mc-cli audit run [--repos] [--file-incidents]."),
+		mcp.WithDescription("Run the configured nightly audit pipeline (tests, infra check, report) via mc-cli. Wraps `mc-cli audit run [--repos] [--file-incidents]`."),
 		mcp.WithString("repos", mcp.Description("Set to true to run testreporter on configured repos")),
-		mcp.WithString("file_incidents", mcp.Description("Set to true to file incidents to global-kb when tests fail")),
+		mcp.WithString("file_incidents", mcp.Description("Set to true to file incidents when tests fail")),
 	)
 }
 
@@ -149,11 +159,14 @@ func NewSpawnPersonaHandler(cli CLIRunner) *SpawnPersonaHandler {
 }
 
 // Tool returns the ironclaw_spawn_persona tool definition.
+//
+// NOTE: Legacy mc-cli surface (gated behind IRONCLAW_MCP_LEGACY_TOOLS=1).
+// Slated for extraction to ironclaw-mc-cli-mcp.
 func (h *SpawnPersonaHandler) Tool() mcp.Tool {
 	return mcp.NewTool(
 		"ironclaw_spawn_persona",
-		mcp.WithDescription("Spawn an agent with a persona (night-auditor, morning-coo, crm-assistant, executive-hathaway, commerce-orchestrator). Calls mc-cli spawn --persona."),
-		mcp.WithString("persona", mcp.Required(), mcp.Description("Persona name")),
+		mcp.WithDescription("Spawn an agent with a named persona via mc-cli. Persona names are deployment-defined (run `mc-cli spawn --list-personas`). Wraps `mc-cli spawn --persona`."),
+		mcp.WithString("persona", mcp.Required(), mcp.Description("Persona name (deployment-defined)")),
 	)
 }
 

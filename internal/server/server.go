@@ -113,7 +113,9 @@ func (s *Server) buildMCPServer() *mcpserver.MCPServer {
 	}
 
 	if s.cli != nil {
-		// Sprint 68: Core ops MCP tools
+		// Legacy mc-cli ops surface. Slated for extraction to ironclaw-mc-cli-mcp.
+		// Only registered when main.go wires a non-nil CLIRunner, which today
+		// requires IRONCLAW_MCP_LEGACY_TOOLS=1 (see config.LegacyMCCLIToolsEnabled).
 		addTool(tools.NewDoctorHandler(s.cli).Tool(), tools.NewDoctorHandler(s.cli).Handle)
 		addTool(tools.NewStatusHandler(s.cli).Tool(), tools.NewStatusHandler(s.cli).Handle)
 		addTool(tools.NewInstallHandler(s.cli).Tool(), tools.NewInstallHandler(s.cli).Handle)
@@ -126,7 +128,7 @@ func (s *Server) buildMCPServer() *mcpserver.MCPServer {
 		addTool(tools.NewCostSummaryHandler(s.cli).Tool(), tools.NewCostSummaryHandler(s.cli).Handle)
 		addTool(tools.NewMemoryStatsHandler(s.cli).Tool(), tools.NewMemoryStatsHandler(s.cli).Handle)
 
-		// Sprint 69: Extended ops MCP tools
+		// Extended legacy ops surface (extraction to ironclaw-mc-cli-mcp).
 		addTool(tools.NewFleetHandler(s.cli).Tool(), tools.NewFleetHandler(s.cli).Handle)
 		addTool(tools.NewRoutineHandler(s.cli).Tool(), tools.NewRoutineHandler(s.cli).Handle)
 		addTool(tools.NewA2AFullHandler(s.cli).Tool(), tools.NewA2AFullHandler(s.cli).Handle)
