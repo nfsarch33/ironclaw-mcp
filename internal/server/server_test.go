@@ -85,29 +85,29 @@ func (m *mockCLI) Run(ctx context.Context, args ...string) (string, error) {
 func TestNew_RegistersBaseTools(t *testing.T) {
 	srv := New(new(mockClient), nil, nil, nil, discardLogger(), "0.1.0")
 	count := srv.RegisteredToolCount()
-	// 14 core + 10 research + 4 uiauto + 4 evolver = 32 (no prometheus = no get_metrics)
-	assert.Equal(t, 32, count)
+	// v1.0 baseline (post research/uiauto/evolver removal): 14 core IronClaw HTTP-bridge tools.
+	assert.Equal(t, 14, count)
 }
 
 func TestNew_WithPrometheus_RegistersMetricsTool(t *testing.T) {
 	srv := New(new(mockClient), new(mockProm), nil, nil, discardLogger(), "0.1.0")
 	count := srv.RegisteredToolCount()
-	// 32 base + get_metrics = 33
-	assert.Equal(t, 33, count)
+	// 14 base + get_metrics = 15
+	assert.Equal(t, 15, count)
 }
 
 func TestNew_WithCLI_RegistersCEOTools(t *testing.T) {
 	srv := New(new(mockClient), nil, &mockCLI{}, nil, discardLogger(), "0.1.0")
 	count := srv.RegisteredToolCount()
-	// 32 base + 6 CEO + 9 dual-ops + 11 ops + 11 extended = 69
-	assert.Equal(t, 69, count)
+	// 14 base + 6 CEO + 9 Sprint-65 dual-ops + 11 Sprint-68 ops + 11 Sprint-69 extended = 51
+	assert.Equal(t, 51, count)
 }
 
 func TestNew_WithAll_RegistersAllTools(t *testing.T) {
 	srv := New(new(mockClient), new(mockProm), &mockCLI{}, &mockCLI{}, discardLogger(), "0.1.0")
 	count := srv.RegisteredToolCount()
-	// 32 base + get_metrics + 6 CEO + 1 GWS + 9 dual-ops + 22 new ops/extended = 71
-	assert.Equal(t, 71, count)
+	// 14 base + get_metrics + 6 CEO + 1 GWS + 9 dual-ops + 22 ops/extended = 53
+	assert.Equal(t, 53, count)
 }
 
 func TestRun_UnknownTransport(t *testing.T) {

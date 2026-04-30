@@ -92,30 +92,6 @@ func (s *Server) buildMCPServer() *mcpserver.MCPServer {
 	agentStatus := tools.NewAgentStatusHandler(s.client)
 	addTool(agentStatus.Tool(), agentStatus.Handle)
 
-	research := tools.NewResearchHandler()
-	addTool(research.ScrapeTool(), research.HandleScrape)
-	addTool(research.PDFTool(), research.HandlePDF)
-	addTool(research.SearchTool(), research.HandleSearch)
-	addTool(research.StoreTool(), research.HandleStore)
-	addTool(research.PipelineTool(), research.HandlePipeline)
-	addTool(research.TranscriptTool(), research.HandleTranscript)
-	addTool(research.ExtractTool(), research.HandleExtract)
-	addTool(research.CrawlTool(), research.HandleCrawl)
-	addTool(research.DeakinTool(), research.HandleDeakin)
-	addTool(research.AssessmentsTool(), research.HandleAssessments)
-
-	uiauto := tools.NewUIAutoHandler()
-	addTool(uiauto.NavigateTool(), uiauto.HandleNavigate)
-	addTool(uiauto.DiscoverTool(), uiauto.HandleDiscover)
-	addTool(uiauto.HealTool(), uiauto.HandleHeal)
-	addTool(uiauto.VerifyTool(), uiauto.HandleVerify)
-
-	evolver := tools.NewEvolverHandler()
-	addTool(evolver.StatusTool(), evolver.HandleStatus)
-	addTool(evolver.ProposeTool(), evolver.HandlePropose)
-	addTool(evolver.ValidateTool(), evolver.HandleValidate)
-	addTool(evolver.PromoteTool(), evolver.HandlePromote)
-
 	if s.prom != nil {
 		getMetrics := tools.NewGetMetricsHandler(s.prom)
 		addTool(getMetrics.Tool(), getMetrics.Handle)

@@ -5,6 +5,8 @@
 
 A production-ready **MCP (Model Context Protocol) server** written in Go that bridges [IronClaw](https://github.com/nearai/ironclaw) with any MCP-compatible AI coding assistant — Cursor, Claude Code, VS Code Copilot, and more.
 
+> **v1.0 cleanup (April 2026)**: Removed all `ironclaw_research_*`, `ironclaw_ui_*`, and `ironclaw_evolver_*` tools that wrapped the external `research-agent` CLI. `ironclaw-mcp` is now a focused IronClaw HTTP-bridge with optional CLI-driven dual-ops surfaces. Scraper, browser-automation, and evolver workflows have been moved out-of-tree (see `agentic-ai-research` for replacement tooling). The pre-cleanup snapshots are archived under `~/Code/global-kb/session-handoffs/evidence/v257-w2-d0-ironclaw-mcp-cleanup/before/`.
+
 ## Tools Exposed
 
 | Tool | Description |
@@ -157,7 +159,7 @@ The supported local setup for Cursor integration:
 #### `--all` and `--report` flags
 
 ```bash
-# Test all 15 tools with deterministic payloads
+# Test all 14 base tools (15 with PROMETHEUS_URL) with deterministic payloads
 make smoke SMOKE_ARGS="--all"
 
 # Get JSON test results (pipe to jq, CI artifacts, etc.)
